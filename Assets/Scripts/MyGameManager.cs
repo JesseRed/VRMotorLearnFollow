@@ -31,7 +31,9 @@ public class MyGameManager : MonoBehaviour
     public GameObject anzeigeText;
     //public Catmul playBall;
     public bool is_game_active = true;
-
+    private GameObject leftHand, rightHand, rightEye, centerEye;
+    private GameObject ovrPlayerController2;
+    private GameObject forwardDirection2, ovrCameraRig2, trackingSpace2, offset32;
 
     private void Awake()
     {
@@ -39,6 +41,13 @@ public class MyGameManager : MonoBehaviour
         gameSession = FindObjectOfType<GameSession>();
         parameter = FindObjectOfType<Parameter>();
         Physics.gravity = new Vector3(0.0f, -9.81f , 0.0f);
+        rightEye = GameObject.Find("RightEyeAnchor");
+        centerEye = GameObject.Find("CenterEyeAnchor");
+        ovrPlayerController2 = GameObject.Find("OVRPlayerController");
+        forwardDirection2 = GameObject.Find("ForwardDirection");
+        ovrCameraRig2 = GameObject.Find("OVRCameraRig");
+        trackingSpace2 = GameObject.Find("TrackingSpace");
+        //offset32 = GameObject.Find("CenterEyeAnchor");
         //playBall = FindObjectOfType<PlayBall>();
     }
 
@@ -47,10 +56,6 @@ public class MyGameManager : MonoBehaviour
         return current_ball_id;
     }
 
-    public float get_current_Ball_Mass()
-    {
-        return parameter.current_ball_mass;
-    }
     
     private void SetUpSingleton()
     {
@@ -74,11 +79,11 @@ public class MyGameManager : MonoBehaviour
         ovrCameraRig = FindObjectOfType<OVRCameraRig>();
        
         //StartCoroutine (CompensateHeadPosition());
-        parameter.adaptHand();
+        //parameter.adaptHand();
         //parameter.set_bounding_box_to_play();
         //SpawnNewBall();
 
-        anzeigeText.GetComponent<TextMeshPro>().SetText("!!Bitte versuchen sie immer mit dem Zeigefinger in Kontakt mit dem roten Ball zu bleiben.\n Der Ball wird sich bewegen sobald sie ihn beruehren");
+        anzeigeText.GetComponent<TextMeshPro>().SetText("Bitte versuchen sie immer mit dem Zeigefinger in Kontakt mit dem roten Ball zu bleiben.\n Der Ball wird sich bewegen sobald sie ihn beruehren");
   
         StartCoroutine(spawnmanagement());
         
@@ -88,10 +93,28 @@ public class MyGameManager : MonoBehaviour
 
 
     void Update(){
-        
+        // Debug.Log("rightEye Position" + rightEye.transform.position);
+        // Debug.Log("OVRPlayerController Position" + ovrPlayerController2.transform.position);
+        // Debug.Log("ForwardDirection Position" + forwardDirection2.transform.position);
+        // Debug.Log("OVRCameraRig Position" + ovrCameraRig2.transform.position);
+        // Debug.Log("TrackingSpace Position" + trackingSpace2.transform.position);
         //SpawnNewBall();
     }
 
+    IEnumerator inter_ball_counter(){
+        //zeigt den Counter bis zum erscheinen des naechsten Balls
+        int duration = (int) gameSession.paradigma.no_ball_duration;
+        anzeigeText.GetComponent<TextMeshPro>().SetText("Weiter in ...\n " + duration.ToString() + "\n Sekunden");
+        while (duration>0)
+        {
+            
+            yield return new WaitForSeconds(1.0f);
+            duration--;
+            anzeigeText.GetComponent<TextMeshPro>().SetText("Weiter in ...\n " + duration.ToString() + "\n Sekunden");
+  
+
+        }
+    }
 
     IEnumerator spawnmanagement()
     {
@@ -103,23 +126,48 @@ public class MyGameManager : MonoBehaviour
         //if (parameter.is_playarea_initialized){
         //    Debug.Log("MyGameManager:spawnmanagement parameter.is_playarea_initialized ... now SpawnNewBall");
             if (cloneplayBall) { 
-                Debug.Log("MyGameManager:spawnmanagmement: cloneplayBall exists");
-                anzeigeText.GetComponent<TextMeshPro>().SetText("cloneplayBAll Versuchen sie mit dem Zeigefinger \nimmmer im Kontakt mit dem Ball zu bleiben");
-                    
+                //Debug.Log("MyGameManager:spawnmanagmement: cloneplayBall exists");
+                anzeigeText.GetComponent<TextMeshPro>().SetText("Bitte versuchen sie immer mit dem Zeigefinger in Kontakt mit dem roten Ball zu bleiben.\n Der Ball wird sich bewegen sobald sie ihn beruehren");
+  
                 yield return new WaitForSeconds(2.0f);
             }
             if (! cloneplayBall) {
+                parameter.reset_hand();
                 current_ball_id += 1;
                 if (current_ball_id>=gameSession.paradigma.numBalls){
                     anzeigeText.GetComponent<TextMeshPro>().SetText("Das Spiel ist vorbei! \n Sie können nun das HeadSet absetzen!");
                     yield break;
                 }
                 Debug.Log("MyGameManager:spawnmanagmement: no cloneplayBall -> instantiate new one");
-                yield return new WaitForSeconds(1.0f);
+                yield return StartCoroutine(inter_ball_counter());
+//               yield return new WaitForSeconds(1.0f);
 
+                
+                // Debug.Log("before............");
+                // Debug.Log("rightEye Position" + rightEye.transform.position);
+                // Debug.Log("OVRPlayerController Position" + ovrPlayerController2.transform.position);
+                // Debug.Log("ForwardDirection Position" + forwardDirection2.transform.position);
+                // Debug.Log("OVRCameraRig Position" + ovrCameraRig2.transform.position);
+                // Debug.Log("TrackingSpace Position" + trackingSpace2.transform.position);
+                // parameter.reset_hand();
+                // Debug.Log("after reset hand...........");
+                // Debug.Log("rightEye Position" + rightEye.transform.position);
+                // Debug.Log("OVRPlayerController Position" + ovrPlayerController2.transform.position);
+                // Debug.Log("ForwardDirection Position" + forwardDirection2.transform.position);
+                // Debug.Log("OVRCameraRig Position" + ovrCameraRig2.transform.position);
+                // Debug.Log("TrackingSpace Position" + trackingSpace2.transform.position);
                 parameter.prepare_parameter_for_next_ball(current_ball_id);
+                Debug.Log("after..................");
+                Debug.Log("rightEye Position" + rightEye.transform.position);
+                Debug.Log("OVRPlayerController Position" + ovrPlayerController2.transform.position);
+                Debug.Log("ForwardDirection Position" + forwardDirection2.transform.position);
+                Debug.Log("OVRCameraRig Position" + ovrCameraRig2.transform.position);
+                Debug.Log("TrackingSpace Position" + trackingSpace2.transform.position);
+                
+                Debug.Log("spawn new Ball at position: " + parameter.playarea_center);
+
                 SpawnNewBall();
-                 Debug.Log("spqwnmanagement: after Instantiate");
+                Debug.Log("spqwnmanagement: after Instantiate");
             }
             // if (!playBall.is_active){
             //     Debug.Log("MyGameManager:spawnmanagement playBall.is_active = "+ playBall.is_active);
@@ -133,6 +181,9 @@ public class MyGameManager : MonoBehaviour
         // // StartCoroutine(MoveTheBall(ball, spawnPosition, 5.0f));
     }
 
+    public void show_counter(){
+
+    }
 
     public void SpawnNewBall()
     {
@@ -142,7 +193,13 @@ public class MyGameManager : MonoBehaviour
         Debug.Log("after Quaternion");
         spawnRotation.eulerAngles = new Vector3 (0.0f, 0.0f);        
         Debug.Log("after spawnRotatino");
-        cloneplayBall = Instantiate (playBallPrefab, parameter.playarea_center, spawnRotation);
+        Vector3 spawnposition = parameter.GetSpawnPosition();
+        Debug.Log("right Eye Postion = " + rightEye.transform.position);
+        Debug.Log("center Eye Postion = " + centerEye.transform.position);
+        
+        Debug.Log("new spawn Position = " + spawnposition);
+        Debug.Log("spawn new Ball at position: " + parameter.playarea_center);
+        cloneplayBall = Instantiate (playBallPrefab, spawnposition, spawnRotation);
         Debug.Log("SpawnNewBall: after after Instantiate");
 
        

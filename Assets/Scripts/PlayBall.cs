@@ -14,8 +14,8 @@ public class PlayBall : MonoBehaviour {
 	
 	// How many points you want on the curve
 	//uint numberOfPoints = 300;
-	Vector3 playarea_min;
-	Vector3 playarea_max;
+	private Vector3 playarea_min;
+	private Vector3 playarea_max;
 	// Parametric constant: 0.0 for the uniform spline, 0.5 for the centripetal spline, 1.0 for the chordal spline
 	public float alpha = 0.5f;
     // Start is called before the first frame update
@@ -27,6 +27,7 @@ public class PlayBall : MonoBehaviour {
     public float currentFingerBallDist;
     public bool is_waitForStart = false;
     public bool is_stopped = true;
+    public bool is_invert_applied = false;
     public bool is_active = false;
     public MyGameManager myGameManager;
     public GameSession gameSession;
@@ -35,8 +36,14 @@ public class PlayBall : MonoBehaviour {
     private float ball_vel;
     private float time_start_moving;
     public Parameter parameter;
+    private float cur_ball_vel;
     private Vector3 playarea_center; 
     private float ball_duration;
+    private bool is_vel_adaptable;
+    private float ball_vel_max;
+    private int punkte_in_frame;
+    public PunkteHistory punkteHistory;
+    
     // es wird hier nicht immer ein neuer Ball gespawned sondern wir
     // verwenden hier den gleichen Ball
 
@@ -55,10 +62,10 @@ public class PlayBall : MonoBehaviour {
         rightEye = GameObject.Find("RightEyeAnchor");
         // die Bounding Box wird bei jedem Ball neu gesetzt falls der Player sich mit der Zeit 
         // anders setzt
-        set_current_playarea_and_object_transform();
-        
-        
-                
+
+        // moved to touch of ball 04.07.2021
+        // current difficulty wird angewendet (nicht berechnet)
+        // parameter.apply_current_difficulty_to_hand();
                 
         // setting the playarea in which the object travels
         // Vector3 min = new Vector3(0.0f, -1.0f, 0.2f);
@@ -72,41 +79,56 @@ public class PlayBall : MonoBehaviour {
         //myline.SetPosition(0,min);
         //myline.SetPosition(0,max);
         ball_size = gameSession.paradigma.ball_size_max;
-        ball_vel = gameSession.paradigma.ball_veloc_max;
+        //ball_vel = gameSession.paradigma.ball_veloc_max;
         ball_duration = gameSession.paradigma.ball_duration;
         Debug.Log("PlayBall:Awake:ball_duration = "+ ball_duration);
         transform.localScale = new Vector3(ball_size, ball_size, ball_size);
+        cur_ball_vel = gameSession.paradigma.ball_veloc_std;
+        is_vel_adaptable = gameSession.paradigma.adapt_veloc_in_trial;
+        ball_vel_max = gameSession.paradigma.ball_veloc_in_trial_max;
+        //target_diff = parameter.cur_target_difficulty;
+        punkteHistory = new PunkteHistory();
+        Debug.Log("gameSession.paradigma.adapt_veloc_in_trial_based_on_last_framenum"+gameSession.paradigma.adapt_veloc_in_trial_based_on_last_framenum.ToString());
+        punkteHistory.setHistoryLength(Mathf.RoundToInt(gameSession.paradigma.adapt_veloc_in_trial_based_on_last_framenum));
         waitForStart();
     }
     void Start(){
         Debug.Log("STart PlayBall");
         
     }
+  
 
-    void set_current_playarea_and_object_transform(){
-        // float xh = rightHand.transform.position.x;
-        // float yh = rightHand.transform.position.y;
-        // float zh = rightHand.transform.position.z;
-        // float xe = rightEye.transform.position.x;
-        // float ye = rightEye.transform.position.y;
-        // float ze = rightEye.transform.position.z; 
+    IEnumerator reinitiate_ball_with_invert()
+    {
+        // der Ball ist bereits in einer Position initiiert worden
+        // es wurde dann darauf gewartet, dass der Finger den Ball beruehrt
+        // diese Coroutine wurde dann gestartet um die moegliche Invertierung
+        // auf die Hand vorzunehmen
+            Debug.Log("before parameter.apply_current_difficulty_to_hand()");
+            Debug.Log("rightHand.transform.position="+ rightHand.transform.position.ToString());
+            Debug.Log("Ball.transform.position="+ transform.position.ToString());
+            parameter.apply_current_difficulty_to_hand();
+            yield return new WaitForSeconds(0.05f);
+            Debug.Log("after1 ... rightHand.transform.position="+ rightHand.transform.position.ToString());
+            Debug.Log("after1 ... Ball.transform.position="+ transform.position.ToString());
 
-        // playarea_min[0] = rightEye.transform.position.x-0.2f;
-        // playarea_min[1] = rightEye.transform.position.y-0.3f;
-        // playarea_min[2] = rightEye.transform.position.z+0.15f;
-        // playarea_max[0] = rightEye.transform.position.x+0.2f;
-        // playarea_max[1] = rightEye.transform.position.y-0.1f;
-        // playarea_max[2] = rightEye.transform.position.z+0.4f;
+            playarea_center = parameter.GetSpawnPosition2();
+            transform.position = playarea_center;
+            playarea_min = parameter.get_playarea_min();
+            playarea_max = parameter.get_playarea_max();
+            Debug.Log("after2 ... rightHand.transform.position="+ rightHand.transform.position.ToString());
+            Debug.Log("after2 ... Ball.transform.position="+ transform.position.ToString());
+            // die berechnete initiale Ballgeschwindigkeit
+            cur_ball_vel = parameter.ballDifficulty.new_ball_veloc;
+            // setze die Startzeit des Balls
+            time_start_moving = Time.time;
+            Debug.Log("time_start_moving = " + time_start_moving);
+            is_waitForStart = false;
+            is_stopped = false;
+            is_active = true;
 
-        playarea_min[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_min_x;
-        playarea_min[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_min_y;
-        playarea_min[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_min_z;
-        playarea_max[0] = rightEye.transform.position.x+gameSession.paradigma.playarea_max_x;
-        playarea_max[1] = rightEye.transform.position.y+gameSession.paradigma.playarea_max_y;
-        playarea_max[2] = rightEye.transform.position.z+gameSession.paradigma.playarea_max_z;
-        playarea_center = (playarea_min+playarea_max)/2.0f;
-        transform.position = playarea_center;
     }
+
 
 	void Update()
 	{
@@ -115,17 +137,16 @@ public class PlayBall : MonoBehaviour {
         myline.SetPosition(0, rightHand.transform.position);
         myline.SetPosition(1, transform.position);
         // waiting that the finger comes near
-        if (is_waitForStart) {
+        if (is_waitForStart && !is_invert_applied) {
             //Debug.Log("Catmul:Update is_waitForStart() with currentFingerBallDist = " + currentFingerBallDist);
             if (currentFingerBallDist<0.01f){
                 // ####################
                 // Der start des Balls
-                // setze die Startzeit des Balls
-                time_start_moving = Time.time;
-                Debug.Log("time_start_moving = " + time_start_moving);
-                is_waitForStart = false;
-                is_stopped = false;
-                is_active = true;
+                // current difficulty wird angewendet (nicht berechnet)
+                is_invert_applied = true;
+                StartCoroutine(reinitiate_ball_with_invert());
+
+
             }
         }
         if (!is_stopped){
@@ -138,20 +159,62 @@ public class PlayBall : MonoBehaviour {
             }else{
                 idx = 0;
                 waypointList.RemoveAt(idx);
-                CatmulRom(waypointList, 0.1f);
+                // in trial velocity adaptation
+                if (is_vel_adaptable){
+                    cur_ball_vel = adapt_vel_in_trial(cur_ball_vel);
+                }
+                CatmulRom(waypointList, cur_ball_vel);
             }
             // hier sollten noch andere Parameter
             time_ball_active = Time.time-time_start_moving;
-            //Debug.Log("estimate time_ball_active = " + time_ball_active + " ball_duration = "+ ball_duration);
+            Debug.Log("estimate time_ball_active = " + time_ball_active + " ball_duration = "+ ball_duration);
             gameSession.add_Ball_Hand_Position(ID, transform.position, rightHand.transform.position, Time.time, time_ball_active);
-            parameter.push_infos(currentFingerBallDist);
+            //Debug.Log("Ball Position = " + transform.position);
+            //Debug.Log("Hand Position = " + rightHand.transform.position);
+            // gebe die Infos an parameter Klasse und an die punkteHistory Klasse weiter
+
+            punkteHistory.add_punkte(currentFingerBallDist, ball_size, time_ball_active);
+            Debug.Log("punkteHistorz.getHitRAte = " +  punkteHistory.get_hit_rate());
+            parameter.push_infos(currentFingerBallDist, punkteHistory.get_hit_rate());
             if ( time_ball_active>ball_duration){
+                parameter.register_finished_block();
+                parameter.lastBallEndVeloc = cur_ball_vel;
+                parameter.reset_hand();
+                is_stopped = true;
+                is_active = false;
+                gameSession.SaveIntoJson();
                 Debug.Log("time_ball_active>ball_duration");
-                 StartCoroutine(save_and_destroy());
+                StartCoroutine(save_and_destroy());
             }
         }
 	}
-
+    
+    public float adapt_vel_in_trial(float cur_ball_vel){
+        // passe die Ballgeschwindigkeit an
+        // die neue Ballgeschwindigkeit
+        float ball_v = cur_ball_vel;
+        float previous_hit_rate = punkteHistory.get_hit_rate();
+        // wie stark soll die Ballgeschwindigkeit in einem Frame maximal erhoeht werden?
+        // berechne erst die Varianz
+        float vel_var = gameSession.paradigma.ball_veloc_in_trial_max-gameSession.paradigma.ball_veloc_min;
+        // 180 waeren 3 sekunden mit 60 frames d.h. volle Geschwindigkeitsaenderung waere ueber
+        // einen Bereich von 3 Sekunden moeglich
+        float vel_var_per_frame = vel_var/80.0f;
+//        Debug.Log("hit rate = " + punkteHistory.get_hit_rate());
+        if (punkteHistory.get_hit_rate()<gameSession.paradigma.desired_hit_rate){
+            ball_v -= vel_var_per_frame;
+        }else{
+            ball_v += vel_var_per_frame;
+        }
+        if (ball_v > gameSession.paradigma.ball_veloc_in_trial_max){
+            ball_v = gameSession.paradigma.ball_veloc_in_trial_max;
+        }
+        if (ball_v <gameSession.paradigma.ball_veloc_in_trial_min){
+            ball_v = gameSession.paradigma.ball_veloc_in_trial_min;
+        }
+        //target_diff = parameter.cur_target_difficulty;
+        return (ball_v);
+    }
 
     public void waitForStart(){
         Debug.Log("Catmul:waeitForStart()");
@@ -174,10 +237,9 @@ public class PlayBall : MonoBehaviour {
 
     IEnumerator save_and_destroy(){
         Debug.Log("PlayBall:save_and_destroy()");
-        is_stopped = true;
-        is_active = false;
-        gameSession.SaveIntoJson();
-        yield return new WaitForSeconds(1.5f);
+        // setzte alle veraenderungen der Handrepraesentation zurueck
+
+        yield return new WaitForSeconds(0.5f);
         Debug.Log("PlayBall:save_and_destroy: Now Destroy ball Nr " + ID);
         Destroy(gameObject);
     }
@@ -192,7 +254,7 @@ public class PlayBall : MonoBehaviour {
     //     playarea_max = max;
     // }
     void addwaypoint(Vector3 min, Vector3 max){
-            if (waypointList.Count==0){
+            if (waypointList.Count<3){
                 waypointList.Add(transform.position);
             }
             float x = Random.Range(min.x, max.x);
@@ -252,5 +314,41 @@ public class PlayBall : MonoBehaviour {
     // }
     public void set_ID(int newID){
         ID = newID;
+    }
+}
+
+public class PunkteHistory{
+    public List<float> fingerBallDist = new List<float>();
+    public List<float> treffer = new List<float>();
+    public List<float> timepoint = new List<float>();
+    public float treffersum = 0.0f;
+    private int list_length = 120;
+
+    // ich muss hier bei der init noch den parameter uebergeben
+    // init mit adapt_veloc_in_trial_based_on_last_framenum
+
+    public void setHistoryLength(int l){
+        Debug.Log("newlistlength = "+ l.ToString());
+        list_length = l;
+    }
+    public void add_punkte(float dist, float ball_size, float t){
+        fingerBallDist.Add(dist);
+        timepoint.Add(t);
+        if (dist<ball_size/2){treffer.Add(1.0f);}else{treffer.Add(0.0f);}
+        treffersum += treffer[treffer.Count-1];
+        if (fingerBallDist.Count>list_length){
+            treffersum -= treffer[0];
+            fingerBallDist.RemoveAt(0);
+            timepoint.RemoveAt(0);
+            treffer.RemoveAt(0);
+        }       
+        //if ((timepoint[timepoint.Count-1] - timepoint[0])>2.0f){
+
+        
+    }
+
+    public float get_hit_rate(){
+
+        return (treffersum/treffer.Count);
     }
 }

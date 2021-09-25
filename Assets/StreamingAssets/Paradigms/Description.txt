@@ -1,0 +1,140 @@
+Anzahl der Baelle die im Spiel initiert werden
+"numBalls":4,
+
+Wieviele Sekunden ein Ball spielbar ist
+"ball_duration":8,
+
+Ob sich die Ballgroesse andert // nicht implementiert
+"adapt_ball_size" : true,
+
+Minimale Ballgroesse // wird nicht beachtet
+"ball_size_min": 0.01,
+
+Maximale Ballgroesse // aktuell wire diese Groesse als Ballgroesse verwendet
+"ball_size_max": 0.03,
+
+Ob die Geschwindigkeit im Spiel von Ball zu Ball adaptiert wird
+"adapt_veloc" : true,
+
+Minimale Geschwindigkeit mit der ein Ball initiert wird
+"ball_veloc_min": 0.3,
+
+Geschwindigkeit mit der der Ball startet wenn die Geschwindigkeit nicht extra ausgewuerfelt wird
+z.B. wenn adapt_veloc auf false steht
+"ball_veloc_std": 2.0,
+
+Maximale Geschwindigkeit mit der ein Ball initiiert wird
+"ball_veloc_max": 4.0,
+
+Ob der Ball innerhalb eines Trials in seiner Geschwindigkeit angepasst wird
+"adapt_veloc_in_trial" : true,
+
+maximale Geschindigkeit eines Balls in einem Trial
+"ball_veloc_in_trial_max": 10.0,
+
+Begrenzung des Spielfelds in dem sich der Ball bewegt nach links
+"playarea_min_x": -0.2,
+
+Begrenzung des Spielfelds in dem sich der Ball bewegt nach unten
+"playarea_min_y": -0.2,
+
+Begrenzung des Spielfelds in dem sich der Ball bewegt nach vorn
+"playarea_min_z": 0.1,
+
+Begrenzung des Spielfelds in dem sich der Ball bewegt nach rechts
+"playarea_max_x": 0.2,
+
+Begrenzung des Spielfelds in dem sich der Ball bewegt nach oben
+"playarea_max_y": 0.0,
+
+Begrenzung des Spielfelds in dem sich der Ball bewegt nach hinten
+"playarea_max_z": 0.3,
+
+Einstellung des Offsets der Hand in X Richtung
+festes Offset mit 0.75
+    "adapt_offset_hand_pos_X" : false,
+    "offset_hand_pos_X_min" : 0.0,
+    "offset_hand_pos_X_max" : 1.5,
+
+    variables Offset zwischen 0.5 und 1.5 wenn ausgewaehlt oder nicht vorhanden
+    "adapt_offset_hand_pos_X" : true,
+    "offset_hand_pos_X_min" : 0.5,
+    "offset_hand_pos_X_max" : 1.5,
+
+kein Offset 
+    "adapt_offset_hand_pos_X" : false,
+    "offset_hand_pos_X_min" : 0.0,
+    "offset_hand_pos_X_max" : 0.0,
+
+
+fuer die anderen offsets an Position und Geschwindigkeit entsprechend analog
+
+    "adapt_offset_hand_pos_Y" : false,
+    "offset_hand_pos_Y_min" : 0.0,
+    "offset_hand_pos_Y_max" : 0.0,
+    "adapt_offset_hand_pos_Z" : false,
+    "offset_hand_pos_Z_min" : 0.0,
+    "offset_hand_pos_Z_max" : 0.0,
+    "adapt_offset_hand_vel_X" : false,
+    "offset_hand_vel_X_min" : 1.0,
+    "offset_hand_vel_X_max" : 1.0,
+    "adapt_offset_hand_vel_Y" : false,
+    "offset_hand_vel_Y_min" : 1.0,
+    "offset_hand_vel_Y_max" : 1.0,
+    "adapt_offset_hand_vel_Z" : false,
+    "offset_hand_vel_Z_min" : 1.0,
+    "offset_hand_vel_Z_max" : 1.0,
+
+Invertierung n X Richtung
+Wenn adapt auf false steht und invert auf 1 dann ist das ein fester WErt der stehts gleich bleibt
+Feste parameter gehen nicht in die Schwierigkeitsberechnung ein
+Sonst muesste der schreiber das Paradigmafiles wissen wie viel noch at top an Schwierigkeit dazu kommen kann
+Der schwierigkeitsgrad passt sich ohnehin dynamisch an
+Feste invertierung der Hand, nicht veraenderlich
+    "adapt_invert_X" : false,
+    "hand_invert_X" : 1.0,
+
+Dynamische invertierung der Hand je nach Schwierigkeitsgradwuerfelung vorhanden oder nicht
+    "adapt_invert_X" : true,
+    "hand_invert_X" : 1.0,
+
+Hier keine Invertierung der Hand moeglich
+    "adapt_invert_X" : false,
+    "hand_invert_X" : 0.0,
+
+
+Adpatation der Y Richtung
+    "adapt_invert_Y" : false,
+    "hand_invert_Y" : 0.0,
+
+Adaptation der Z Richtung analog zu der X Richtung
+    "adapt_invert_Z" : false,
+    "hand_invert_Z" : 0.0,
+    "adapt_tremor_X" : false,
+    "hand_tremor_X" : 0.0,
+    "adapt_tremor_Y" : false,
+    "hand_tremor_Y" : 0.0,
+    "adapt_tremor_Z" : false,
+    "hand_tremor_Z" : 0.0,
+    "hand_tremor_freq" : 0.0,
+
+Hat aktuell keine Bedeutung mehr, da jeder Parameter fuer sich selbst eingestellt werden kann
+    "Adaptive": 0,
+
+// die Zielrate die der Finger im Ball sein soll
+    "desired_hit_rate": 0.5,
+
+Schwierigkeitsgrad der Aufsummiert wird fuer die einzelnen Interventionen
+hier ist vor allem der relative Schwierigkeitsgrad zueinander wichtig
+    "ball_veloc_diff" : 10.0,
+    "offset_hand_pos_diff" : 1.0,
+    "offset_hand_vel_diff" : 2.0,
+    "hand_invert_diff" : 5.0,
+    "hand_tremor_diff" : 3.0,
+
+hat aktuell keine Bedeutung da ich den mittelpunkt der Spielflaeche verwende
+am besten dennoch auf die Mitte der Spielflaeche einstellen
+    "spiegelpunkt_der_invertierung_x" : 0.0,
+    "spiegelpunkt_der_invertierung_y" : -0.1,
+    "spiegelpunkt_der_invertierung_z" : 0.25
+}

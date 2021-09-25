@@ -44,6 +44,10 @@ public static class OVRPlugin
 	public static Vector3 carsten_invert;
 	public static Vector4 carsten_tremor;
 	public static Vector3 carsten_ball_grap_position;
+	public static Vector3 carsten_spiegelpunkt_der_invertierung;
+	public static bool carsten_is_invert_in_effect_X = false;
+	public static bool carsten_is_invert_in_effect_Y = false;
+	public static bool carsten_is_invert_in_effect_Z = false;
 	public static bool is_inverted=false;
 	public static Posef save_posef;
 	public static bool first_time_debug = true;
@@ -2048,34 +2052,81 @@ public static class OVRPlugin
 			// if (is_inverted){
 			// 	Debug.Log("carsten invert = " + carsten_invert.ToString());
 				//Debug.Log("In InVERTED Position save_posef = " + save_posef.Position.ToString());
-				//Debug.Log("In InVERTED Position prior to invert = " + tmp.Position.ToString());
+			if (first_time_debug && carsten_invert[2]>0.1f){
+					// Debug.Log("In InVERTED Position Z before to invert = " + tmp.Position.z.ToString());
+			}
+			if (carsten_invert[2]>0.1f){
+				// Debug.Log("In InVERTED Position Z before to invert = " + tmp.Position.z.ToString());
+			}
 				// tmp.Position.x += (tmp.Position.x-save_posef.Position.x) *carsten_invert[0] *-1.0f;
 				// tmp.Position.y += (tmp.Position.y-save_posef.Position.y) *carsten_invert[1];
 				// tmp.Position.z += (tmp.Position.z-save_posef.Position.z) *carsten_invert[2];
 				//tmp.Position.x = (tmp.Position.x-save_posef.Position.x) *-1.0f;
 				//tmp.Position.x = (tmp.Position.x-0.17f) *-1.0f;
+				// bei dem folgenen Invert werden feste WErte fuer y und z verwendet
+				// das ist erforderlich, da der Mittelpunkt eigentlich die Oculus an sich ist
+				// dann waere eine Invertierung die Hand hinter einem
+				// der Punkt um den gespiegelt wird sollte vor einem liegen
+				// Problem ist dass dies auch auf die gedachte Positionierung des
+				// rightEye Anwendung findet ... damit muessen wir diesen Spiegelpunkt spaeter
+				// wieder abziehen
+
 			if (carsten_invert[0]>0.1f){
 				//tmp.Position.x = (tmp.Position.x) *carsten_invert[0]*-1.0f +0.31f;
-
-				tmp.Position.x = (tmp.Position.x) *carsten_invert[0]*-1.0f ;
+				carsten_is_invert_in_effect_X = true;
+				tmp.Position.x = (tmp.Position.x) *carsten_invert[0]*-1.0f + 0.0f; //+ carsten_spiegelpunkt_der_invertierung[0]*2;
+			}else{
+				carsten_is_invert_in_effect_X = false;
 			}
 			if (carsten_invert[1]>0.1f){
-				tmp.Position.y = (tmp.Position.y) *carsten_invert[1]*-1.0f -0.4f;
+				carsten_is_invert_in_effect_Y = true;
+				// changed 04.07.2021
+				//tmp.Position.y = (tmp.Position.y) *carsten_invert[1]*-1.0f + carsten_spiegelpunkt_der_invertierung[1]*2; //-0.4f;
+				tmp.Position.y = (tmp.Position.y) *carsten_invert[1]*-1.0f -0.45f; //+ carsten_spiegelpunkt_der_invertierung[1]*2; //-0.4f;
+			}else{
+				carsten_is_invert_in_effect_Y = false;
 			}
 			if (carsten_invert[2]>0.1f){
+			
+				carsten_is_invert_in_effect_Z = true;
 				//tmp.Position.z = (tmp.Position.z) *carsten_invert[2]*-1.0f -0.6f;
-				tmp.Position.z = (tmp.Position.z) *carsten_invert[2]*-1.0f -0.6f ;
-			}
 				
-			if (first_time_debug && carsten_invert[0]>0.1f){
-					Debug.Log("grapped at position = " + carsten_ball_grap_position.ToString());
-					Debug.Log("In InVERTED Position after to invert = " + tmp.Position.ToString());
+				// changed 04.07.2021
+				// das Koordinatensystem scheint nicht mit den Welt Koordinaten 
+				// ueberein zu stimmen die ich im Spiel verwende
+				// die Hand Position wird nicht durch ein nach vorn oder hinten beugen
+				// direkt vor dem invertieren beeinflusst, d.h. es wird wohl um die feste
+				// Position der Entitaet gespiegelt und nicht um die Headset position
+				// alle analysen und Tabellen bisher haben mir noch nicht aufzeigen koennen 
+				// wie es wirklich funktioniert 
+				// hier die heuristrische Loesung mit dem Ball in dem Mittelposition
+				tmp.Position.z = (tmp.Position.z) *carsten_invert[2]*-1.0f -0.69f; //+ carsten_spiegelpunkt_der_invertierung[2]*-3.5f; //-0.6f ;
+				//tmp.Position.z = (tmp.Position.z) *carsten_invert[2]*-1.0f; //-0.6f ;
+			}else{
+				carsten_is_invert_in_effect_Z = false;
+			}
+
+
+			if (first_time_debug && carsten_invert[2]>0.1f){
+					// Debug.Log("grapped at position = " + carsten_ball_grap_position.ToString());
+					// Debug.Log("carsten_spiegelpunkt_der_invertierung  = " + carsten_spiegelpunkt_der_invertierung.ToString());
+					
+					// Debug.Log("In InVERTED Position after to invert = " + tmp.Position.z.ToString());
 					first_time_debug=false;
 			}
+			if (carsten_invert[2]>0.1f){
+				// Debug.Log("In INVERTED Position after to invert = " + tmp.Position.z.ToString());
+			}
+			// if (first_time_debug && carsten_invert[0]>0.1f){
+			// 		Debug.Log("grapped at position = " + carsten_ball_grap_position.ToString());
+			// 		Debug.Log("carsten_spiegelpunkt_der_invertierung  = " + carsten_spiegelpunkt_der_invertierung.ToString());
+					
+			// 		Debug.Log("In InVERTED Position after to invert = " + tmp.Position.ToString());
+			// 		first_time_debug=false;
+			// }
 				
 				// tmp.Position.y = (tmp.Position.y) *carsten_invert[1] -0.2f;
 				// tmp.Position.z = (tmp.Position.z) *carsten_invert[2] -0.6f;
-				//Debug.Log("In InVERTED Position after to invert = " + tmp.Position.ToString());
 				//Application.Quit();
 			//}
 			//Debug.Log("tmp Position prior to carsten_offset_hand_pos = " + tmp.Position.ToString());

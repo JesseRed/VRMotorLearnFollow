@@ -220,10 +220,16 @@ public class BallPositionInfo
     public int numBalls;
     public float target_size;
     public float ball_duration;
+    public float no_ball_duration;
+    
     public float ball_size_max;
     public float ball_size_min;
+    
     public float ball_veloc_min;
+    public float ball_veloc_std;
     public float ball_veloc_max;
+    public float ball_veloc_in_trial_min;
+    public float ball_veloc_in_trial_max;
     public float ball_mass;
     public float playarea_min_x;
     public float playarea_min_y;
@@ -265,8 +271,33 @@ public class BallPositionInfo
     public float hand_tremor_Z;
     public float hand_tremor_freq;
     public int Adaptive;
+    public float ball_veloc_diff;
     public float desired_hit_rate;
+    public float offset_hand_pos_diff;
+    public float offset_hand_vel_diff;
+    public float hand_invert_diff;
+    public float hand_tremor_diff;
+    public bool adapt_ball_size;
+    public bool adapt_veloc_in_trial;
+    public int adapt_veloc_in_trial_based_on_last_framenum;
+    public bool adapt_veloc;
+    public bool adapt_offset_hand_pos_X;
+    public bool adapt_offset_hand_pos_Y;
+    public bool adapt_offset_hand_pos_Z;
+    public bool adapt_offset_hand_vel_X;
+    public bool adapt_offset_hand_vel_Y;
+    public bool adapt_offset_hand_vel_Z;
+    public bool adapt_invert_X;
+    public bool adapt_invert_Y;
+    public bool adapt_invert_Z;
+    public bool adapt_tremor_X;
+    public bool adapt_tremor_Y;
+    public bool adapt_tremor_Z;
 
+    public float spiegelpunkt_der_invertierung_x;
+    public float spiegelpunkt_der_invertierung_y;
+    public float spiegelpunkt_der_invertierung_z;
+    
 
 
     }
