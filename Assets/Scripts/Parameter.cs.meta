@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 9e2ae803c967e8742836737319fdc522
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - gameSession: {instanceID: 0}
+  - lineObj: {instanceID: 0}
+  - myGameManager: {instanceID: 0}
+  - marker_OL: {fileID: 3412595361006812700, guid: 3a7800e3ee00e744eac7b3538b491b0e,
+      type: 3}
+  - marker_OR: {instanceID: 0}
+  - marker_UL: {instanceID: 0}
+  - marker_UR: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
