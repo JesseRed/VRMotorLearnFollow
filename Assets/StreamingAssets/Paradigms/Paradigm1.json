@@ -57,6 +57,7 @@
     "offset_hand_vel_diff" : 5.0,
     "hand_invert_diff" : 15.0,
     "hand_tremor_diff" : 4.0,
+    "num_invert_axis_min" : 0,
     "spiegelpunkt_der_invertierung_x" : 0.0,
     "spiegelpunkt_der_invertierung_y" : -0.1,
     "spiegelpunkt_der_invertierung_z" : 0.25

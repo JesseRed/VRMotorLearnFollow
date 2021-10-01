@@ -783,6 +783,8 @@ public class Ball_Difficulty
         Random rnd = new Random();
         float current_diff_score = 0.0f;
         List<int> item_num_list = new List<int>();
+
+        int number_of_active_invert_axes = 0;
         
         int idx = 0;
         // erstelle eine simple Liste aus aufsteigenden Nummern welche der Anzahl von adaptableItems entspricht
@@ -808,6 +810,9 @@ public class Ball_Difficulty
             item_num_list.RemoveAt(my_rand);
             current_diff_score += adaptableItems[item_number].diff_score;
             adaptableItems[item_number].is_active = true;
+            if (adaptableItems[item_number].name == "adapt_invert_X") {number_of_active_invert_axes++;}
+            if (adaptableItems[item_number].name == "adapt_invert_Y") {number_of_active_invert_axes++;}
+            if (adaptableItems[item_number].name == "adapt_invert_Z") {number_of_active_invert_axes++;}
             idx += 1;
         }
         // zum schluss auffuellen mit der Geschwindigkeit
@@ -825,6 +830,38 @@ public class Ball_Difficulty
             if (new_ball_veloc<gameSession.paradigma.ball_veloc_min){new_ball_veloc=gameSession.paradigma.ball_veloc_min;}
             current_diff_score += req_diff;
         }
+        // Wenn die gesamte Schwierigkeitsberechnung abgeschlossen ist wird noch geschaut ob minimum Erforderungen erfuellt sind
+        // wir wollen z.B. das mindestens 1 Axis immer invertiert bleibt
+        int dummy_counter=0;
+        int cur_item_num = 0;
+        while (number_of_active_invert_axes<gameSession.paradigma.num_invert_axis_min){
+            int sel_axis = Random.Range(1, 4); // second number exclusive
+            cur_item_num = 0;
+            while (cur_item_num<adaptableItems.Count){
+                if (sel_axis==1 && adaptableItems[cur_item_num].name == "adapt_invert_X"){
+                    adaptableItems[cur_item_num].is_active = true;
+                    number_of_active_invert_axes++;
+                }
+                if (sel_axis==2 && adaptableItems[cur_item_num].name == "adapt_invert_Y"){
+                    adaptableItems[cur_item_num].is_active = true;
+                    number_of_active_invert_axes++;
+                }
+                if (sel_axis==3 && adaptableItems[cur_item_num].name == "adapt_invert_Z"){
+                    adaptableItems[cur_item_num].is_active = true;
+                    number_of_active_invert_axes++;
+                }
+                cur_item_num++;
+                   
+            }
+            dummy_counter++;
+            if (dummy_counter>100){
+                Debug.Log("ERROR With paradigm file ...");
+                Debug.Log("There are less adaptable invert axis than num_invert_axis_min");
+            }
+        }
+            
+
+
         Debug.Log("adaptableItems ...activity");
         for (int i = 0; i<adaptableItems.Count; i++){Debug.Log(adaptableItems[i].name.ToString() + " " + adaptableItems[i].is_active);}
         Debug.Log("-----------------------------------------");

@@ -1,7 +1,7 @@
 {
-    "numBalls":4,
-    "ball_duration":6,
-    "no_ball_duration":5,
+    "numBalls":12,
+    "ball_duration":40,
+    "no_ball_duration":10,
     "adapt_ball_size" : true,
     "ball_size_min": 0.01,
     "ball_size_max": 0.03,
@@ -57,6 +57,7 @@
     "offset_hand_vel_diff" : 5.0,
     "hand_invert_diff" : 15.0,
     "hand_tremor_diff" : 4.0,
+    "num_invert_axis_min" : 1,
     "spiegelpunkt_der_invertierung_x" : 0.0,
     "spiegelpunkt_der_invertierung_y" : -0.1,
     "spiegelpunkt_der_invertierung_z" : 0.25

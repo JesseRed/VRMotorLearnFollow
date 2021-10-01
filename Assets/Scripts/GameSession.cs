@@ -293,7 +293,7 @@ public class BallPositionInfo
     public bool adapt_tremor_X;
     public bool adapt_tremor_Y;
     public bool adapt_tremor_Z;
-
+    public int num_invert_axis_min;
     public float spiegelpunkt_der_invertierung_x;
     public float spiegelpunkt_der_invertierung_y;
     public float spiegelpunkt_der_invertierung_z;
